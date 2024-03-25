@@ -1,8 +1,11 @@
-# Examples
+## Examples
 
-Please note - the examples provided serve two primary means:
+Checkout example Provisioner and workload specs to demo with Karpenter.
 
-1. Show users working examples of the various ways in which the module can be configured and features supported
-2. A means of testing/validating module changes
+## Usage:
 
-Please do not mistake the examples provided as "best practices". It is up to users to consult the AWS service documentation for best practices, usage recommendations, etc.
+Provisioner specs expect a `CLUSTER_NAME` environment variable to be set to your cluster name. You can use the following command to substitute the environment variable and `kubectl apply` to your cluster:
+
+```
+CLUSTER_NAME=<my-cluster-name> envsubst < provisioner/spot.yaml | kubectl apply -f -
+```
