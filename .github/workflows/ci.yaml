@@ -1,0 +1,17 @@
+name: CI
+on:
+  push:
+    branches:
+      - 'main'
+      - 'release-v*'
+  pull_request:
+  workflow_dispatch:
+jobs:
+  ci:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v4
+    - uses: ./.github/actions/install-deps
+    - name: Enable the actionlint matcher
+      run: echo "::add-matcher::.github/actionlint-matcher.json"
+    - run: make ci-non-test

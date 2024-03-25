@@ -1,0 +1,30 @@
+name: Sweeper
+on:
+  schedule:
+    - cron: '0 */12 * * *'
+  workflow_dispatch:
+jobs:
+  sweeper:
+    permissions:
+      id-token: write # aws-actions/configure-aws-credentials@v4.0.1
+    if: vars.ACCOUNT_ID != '' || github.event_name == 'workflow_dispatch'
+    strategy:
+      fail-fast: false
+      matrix:
+        region: [us-east-2, us-west-2, eu-west-1]
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: configure aws credentials
+        uses: aws-actions/configure-aws-credentials@v4.0.1
+        with:
+          role-to-assume: arn:aws:iam::${{ vars.ACCOUNT_ID }}:role/${{ vars.ROLE_NAME }}
+          aws-region: ${{ matrix.region }}
+      - uses: actions/setup-go@v4
+        with:
+          go-version-file: test/hack/cleanup/go.mod
+          check-latest: true
+          cache-dependency-path: "test/hack/cleanup/go.sum"
+      - run: go run main.go
+        working-directory: ./test/hack/cleanup
+        name: "Run cleanup script"

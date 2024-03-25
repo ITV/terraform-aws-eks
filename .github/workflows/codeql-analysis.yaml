@@ -1,0 +1,31 @@
+name: "CodeQL"
+on:
+  push:
+    branches:
+      - 'main'
+      - 'release-v*'
+  schedule:
+    - cron: '0 12 * * *'
+jobs:
+  analyze:
+    if: github.repository == 'aws/karpenter'
+    name: Analyze
+    runs-on: ubuntu-latest
+    permissions:
+      actions: read # github/codeql-action/init@v2
+      security-events: write # github/codeql-action/init@v2
+
+    strategy:
+      fail-fast: false
+      matrix:
+        language: [ 'go' ]
+
+    steps:
+      - uses: actions/checkout@v4
+      - uses: ./.github/actions/install-deps
+      - run: make vulncheck
+      - uses: github/codeql-action/init@v2
+        with:
+          languages: ${{ matrix.language }}
+      - uses: github/codeql-action/autobuild@v2
+      - uses: github/codeql-action/analyze@v2
